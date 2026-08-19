@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -118,7 +119,8 @@
 const projects=[
 {id:"builder",name:"LogicNest Build",tag:"builder",url:"https://logicnestbuild.carrd.co/",desc:"Roblox builder — custom builds, architecture & immersive experiences."},
 {id:"scripter",name:"LogicNest Scripter",tag:"scripter",url:"https://logicnesttscripter.vercel.app/",desc:"Roblox scripter — utilities, game mechanics & automation tools."},
-{id:"clothing",name:"LogicNest Clothing",tag:"clothing",url:"https://logicnesttt.vercel.app/",desc:"Roblox clothing designer — premium shirts, pants & outfit collections."}
+{id:"clothing",name:"LogicNest Clothing",tag:"clothing",url:"https://logicnesttt.vercel.app/",desc:"Roblox clothing designer — premium shirts, pants & outfit collections."},
+{id:"ui",name:"LogicNest UI",tag:"ui",url:"https://logicnestui.vercel.app/",desc:"LogicNest UI — user interface designs, showcases & projects."}
 ];
 
 const terminalBody=document.getElementById("terminalBody"),terminalInput=document.getElementById("terminalInput");
@@ -154,8 +156,9 @@ const parts=trimmed.split(/\s+/),command=parts[0].toLowerCase(),args=parts.slice
 if(command==="/help"||command==="help"){
 appendOutput(`<span class="highlight">Available commands</span><br><span class="dim">/help /projects /project [name] /open [name] /user [username] /group [name] /game [name] /asset [id] /contact /suggest /theme [name] /status /clear /whoami /echo [text] /mode [console|redirects|tools] /exit</span>`);return}
 if(command==="/projects"||command==="projects"){appendOutput(projects.map((p,i)=>`${i+1}. <span class="project-name">${p.name}</span> <span class="tag">[${p.tag}]</span> <span class="success">live</span>`).join("<br>"));return}
-if((command==="/project"||command==="project")&&args.length){const q=args.join(" ").toLowerCase(),p=projects.find(x=>x.name.toLowerCase().includes(q)||x.id.includes(q)||x.tag.includes(q));appendOutput(p?`<span class="highlight">${p.name}</span><br><span class="dim">id:</span> ${p.id}<br><span class="dim">tag:</span> ${p.tag}<br><span class="dim">desc:</span> ${p.desc}<br><span class="link" onclick="window.open('${p.url}','_blank')">${p.url}</span>`:`<span class="error">Project not found.</span>`);return}
-if(command==="/open"&&args.length){const q=args.join(" ").toLowerCase(),p=projects.find(x=>x.name.toLowerCase().includes(q)||x.id.includes(q)||x.tag.includes(q));if(p){window.open(p.url,"_blank");appendOutput(`<span class="success">Opening ${p.name}...</span>`)}else appendOutput(`<span class="error">Project not found.</span>`);return}
+if((command==="/project"||command==="project")&&args.length){const q=args.join(" ").toLowerCase(),p=projects.find(x=>x.id.toLowerCase()===q)||projects.find(x=>x.name.toLowerCase()===q)||projects.find(x=>x.tag.toLowerCase()===q)||projects.find(x=>x.name.toLowerCase().includes(q)||x.id.toLowerCase().includes(q)||x.tag.toLowerCase().includes(q));appendOutput(p?`<span class="highlight">${p.name}</span><br><span class="dim">id:</span> ${p.id}<br><span class="dim">tag:</span> ${p.tag}<br><span class="dim">desc:</span> ${p.desc}<br><span class="link" onclick="window.open('${p.url}','_blank')">${p.url}</span>`:`<span class="error">Project not found.</span>`);return}
+
+if(command==="/open"&&args.length){const q=args.join(" ").toLowerCase(),p=projects.find(x=>x.id.toLowerCase()===q)||projects.find(x=>x.name.toLowerCase()===q)||projects.find(x=>x.tag.toLowerCase()===q)||projects.find(x=>x.name.toLowerCase().includes(q)||x.id.toLowerCase().includes(q)||x.tag.toLowerCase().includes(q));if(p){window.open(p.url,"_blank");appendOutput(`<span class="success">Opening ${p.name}...</span>`)}else appendOutput(`<span class="error">Project not found.</span>`);return}
 if(command==="/user"||command==="user"){if(!args.length){appendOutput(`<span class="error">Usage: /user [username]</span>`);return}lookupUser(args.join(" "));return}
 if(command==="/group"||command==="group"){if(!args.length){appendOutput(`<span class="error">Usage: /group [name]</span>`);return}lookupGroup(args.join(" "));return}
 if(command==="/game"||command==="game"){if(!args.length){appendOutput(`<span class="error">Usage: /game [name]</span>`);return}lookupGame(args.join(" "));return}
