@@ -1,119 +1,121 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LogicNest · Roblox Creator</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#0b0b0b;color:#e4e4e4;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:1rem;transition:.5s;position:relative;overflow-x:hidden}
-    #bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-    #loading-overlay{position:fixed;inset:0;background:#0a0a0a;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;transition:.8s;font-family:"Courier New",monospace;padding:2rem}
-    #loading-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
-    .boot-container{max-width:700px;width:100%;background:rgba(8,8,8,.9);border:1px solid rgba(40,40,40,.5);border-radius:12px;padding:2rem;box-shadow:0 0 60px rgba(0,20,10,.2)}
-    .boot-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;padding-bottom:.6rem;border-bottom:1px solid rgba(40,40,40,.3);color:#5a5a5a;font-size:.7rem;letter-spacing:2px;text-transform:uppercase}
-    .brand-boot{color:#5fbfa8;font-weight:600;font-size:.85rem}
-    .boot-logs{font-size:.8rem;line-height:1.8;color:#7a8a8a;min-height:200px;max-height:320px;overflow-y:auto}
-    .log-line{opacity:0;animation:fadeInLog .3s forwards}
-    .timestamp{color:#3a5a4a;margin-right:12px}.ok{color:#4a9a6a}.warn{color:#c4a040}.info{color:#5a9ac4}.highlight{color:#5fbfa8;font-weight:600}.dim{color:#6a6a6a}.error{color:#c05050}.gpu{color:#b07ad4}.success{color:#6fbf8f}
-    @keyframes fadeInLog{to{opacity:1}}
-    .boot-progress{margin-top:1.2rem;display:flex;align-items:center;gap:1rem}.progress-bar{flex:1;height:4px;background:rgba(40,40,40,.5);border-radius:4px;overflow:hidden}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#2a5a4a,#5fbfa8);transition:.15s}.progress-label{font-size:.7rem;color:#5a7a6a;min-width:50px;text-align:right}
-    .boot-footer{margin-top:1rem;text-align:center;color:#3a4a4a;font-size:.65rem;letter-spacing:1px;display:flex;justify-content:space-between;align-items:center}.blink{animation:blink 1s step-end infinite}@keyframes blink{50%{opacity:0}}
-    .skip-btn,.action-btn,.mode-btn,.theme-btn,.nav-btn{background:transparent;border:1px solid rgba(60,60,60,.5);color:#aaa;border-radius:30px;cursor:pointer;transition:.2s;font-family:"Courier New",monospace}
-    .skip-btn{padding:.3rem 1rem;font-size:.65rem}.skip-btn:hover,.action-btn:hover,.mode-btn:hover,.nav-btn:hover{border-color:#5fbfa8;color:#eee;background:rgba(95,191,168,.08)}
-    .container{position:relative;z-index:1;max-width:1100px;width:100%;background:rgba(10,10,10,.88);backdrop-filter:blur(10px);border:1px solid rgba(34,34,34,.8);border-radius:28px;padding:1.8rem 1.8rem 1.2rem;box-shadow:0 20px 60px rgba(0,0,0,.8)}
-    .top-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.8rem;margin-bottom:1.2rem;border-bottom:1px solid rgba(28,28,28,.6);padding-bottom:.8rem}
-    .brand{display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap}.brand h1{font-size:1.8rem;font-weight:700;letter-spacing:-.5px;background:linear-gradient(145deg,#a8f0e0,#6dd5c6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.badge{font-size:.65rem;background:rgba(26,26,26,.8);padding:.2rem .8rem;border-radius:40px;letter-spacing:1.5px;color:#7a7a7a;border:1px solid rgba(42,42,42,.8);text-transform:uppercase}
-    .status-chip{display:flex;gap:1rem;flex-wrap:wrap;font-size:.7rem;color:#7e7e7e;background:rgba(19,19,19,.7);padding:.3rem 1rem;border-radius:40px;border:1px solid rgba(33,33,33,.7)}.status-chip i{color:#5fbfa8}.status-chip span{color:#b0b0b0}
-    .theme-selector{display:flex;gap:.3rem;align-items:center;background:rgba(21,21,21,.7);padding:.15rem .5rem;border-radius:40px;border:1px solid rgba(40,40,40,.7);flex-wrap:wrap}.theme-selector span{font-size:.6rem;color:#6a6a6a}.theme-btn{border:none;padding:.15rem .4rem;font-size:.55rem;text-transform:uppercase;letter-spacing:.5px}.theme-btn.active{color:#eee;background:rgba(42,42,42,.8);box-shadow:inset 0 0 0 1px rgba(58,58,58,.8)}
-    .mode-switch{display:flex;gap:.4rem;margin-bottom:1rem;padding:.35rem;background:rgba(17,17,17,.8);border:1px solid rgba(40,40,40,.5);border-radius:14px}.mode-btn{flex:1;padding:.55rem;font-size:.72rem;border-radius:30px}.mode-btn.active{background:#5fbfa8;color:#0b0b0b;border-color:#5fbfa8}
-    .view{display:none}.view.active{display:block}
-    .terminal-main{border-radius:16px;overflow:hidden;border:1px solid rgba(40,40,40,.5);background:rgba(6,6,6,.9);margin-bottom:1.2rem}.terminal-header{display:flex;align-items:center;gap:.6rem;padding:.5rem 1.2rem;background:rgba(16,16,16,.7);border-bottom:1px solid rgba(40,40,40,.3);font-size:.7rem;color:#6a6a6a}.dots{display:flex;gap:5px}.dot{width:10px;height:10px;border-radius:50%}.red{background:#ff5f56}.yellow{background:#ffbd2e}.green{background:#27c93f}.title{margin-left:.4rem;font-family:"Courier New",monospace;color:#8a8a8a}.terminal-body{padding:1rem 1.2rem;max-height:460px;min-height:320px;overflow-y:auto;font-family:"Courier New",monospace;font-size:.85rem;line-height:1.6;color:#c8c8c8}.terminal-output{margin-bottom:.4rem;white-space:pre-wrap;word-break:break-word}.terminal-input-line{display:flex;align-items:center;gap:.5rem;margin-top:.4rem;padding-top:.3rem;border-top:1px solid rgba(40,40,40,.3)}.terminal-prompt{font-weight:600;color:#5fbfa8}.terminal-input{background:transparent;border:none;color:#e0e0e0;font-family:"Courier New",monospace;font-size:.85rem;outline:none;width:100%;padding:.3rem 0}.link{color:#6ab0d6;text-decoration:underline;cursor:pointer}.project-name{color:#7ac4b0;font-weight:600}.tag{color:#a0a0a0;font-size:.8em}
-    .normal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
-    .tool-card{background:rgba(14,14,14,.82);border:1px solid rgba(40,40,40,.6);border-radius:18px;padding:1.1rem}.tool-card h3{font-size:.95rem;font-weight:500;margin-bottom:.35rem}.tool-card p{font-size:.72rem;color:#777;line-height:1.5;margin-bottom:.8rem}.tool-row{display:flex;gap:.5rem;flex-wrap:wrap}.tool-card input,.tool-card select{flex:1;min-width:150px;background:#141414;border:1px solid #303030;color:#ddd;border-radius:10px;padding:.65rem .75rem;outline:none}.tool-card input:focus,.tool-card select:focus{border-color:#5fbfa8}.tool-card button{background:#5fbfa8;color:#0b0b0b;border:none;border-radius:10px;padding:.65rem .9rem;cursor:pointer;font-weight:600}.result{margin-top:.8rem;padding:.8rem;background:#0b0b0b;border:1px solid #252525;border-radius:12px;min-height:42px;font-size:.75rem;line-height:1.6;overflow:auto}
-    .profile{display:flex;gap:.8rem;align-items:center}.profile img{width:64px;height:64px;border-radius:14px;object-fit:cover;border:1px solid #333}.card-list{display:grid;gap:.5rem}.mini-card{display:flex;align-items:center;gap:.7rem;padding:.65rem;background:#101010;border:1px solid #242424;border-radius:10px}.mini-card img{width:42px;height:42px;border-radius:8px;object-fit:cover}.mini-card strong{display:block;color:#ddd}.mini-card small{color:#777}
-    .contact-mini{background:rgba(15,15,15,.5);border:1px solid rgba(31,31,31,.5);border-radius:16px;padding:1.2rem 1.5rem;margin-top:.6rem;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.8rem}.label{font-size:.75rem;color:#8a8a8a}.action-btn{padding:.3rem 1rem;font-size:.7rem}
-    .footer{margin-top:1.2rem;text-align:center;color:#3d3d3d;font-size:.65rem;letter-spacing:2px;border-top:1px solid rgba(22,22,22,.5);padding-top:1rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
-    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);display:none;justify-content:center;align-items:center;z-index:10000;padding:1rem}.modal-overlay.active{display:flex}.modal-box{background:#121212;border:1px solid rgba(60,60,60,.4);border-radius:20px;padding:2rem;max-width:500px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.9)}.modal-box h2{color:#e0e0e0;font-weight:400;font-size:1.2rem;margin-bottom:1.2rem}.close-modal{float:right;background:transparent;border:none;color:#777;font-size:1.2rem;cursor:pointer}.modal-box input,.modal-box textarea{background:#141414;border:1px solid #282828;border-radius:12px;padding:.8rem 1rem;color:#e0e0e0;font-size:.9rem;outline:none;width:100%;margin-bottom:.8rem}.modal-box textarea{min-height:100px;resize:vertical}.submit-btn{background:#5fbfa8;border:none;color:#0b0b0b;padding:.8rem 1.8rem;font-weight:600;border-radius:40px;cursor:pointer;font-size:.85rem;width:100%}
-    body[data-theme=grayscale] .brand h1{background:linear-gradient(145deg,#c0c0c0,#888);-webkit-background-clip:text;-webkit-text-fill-color:transparent}body[data-theme=night] .brand h1{background:linear-gradient(145deg,#7ab8e6,#3a7ca5);-webkit-background-clip:text;-webkit-text-fill-color:transparent}body[data-theme=muted] .brand h1{background:linear-gradient(145deg,#b8b0a8,#8a8078);-webkit-background-clip:text;-webkit-text-fill-color:transparent}body[data-theme=sunset] .brand h1{background:linear-gradient(145deg,#f5b8a0,#d4806a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}body[data-theme=forest] .brand h1{background:linear-gradient(145deg,#8ac0a0,#4a8a6a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}body[data-theme=ocean] .brand h1{background:linear-gradient(145deg,#7ac8e6,#3a8aaa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}body[data-theme=lavender] .brand h1{background:linear-gradient(145deg,#c8a8e6,#9a6aba);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    @media(max-width:700px){body{padding:.5rem}.container{padding:1rem;border-radius:20px}.top-bar{flex-direction:column;align-items:stretch}.status-chip,.theme-selector{justify-content:center}.normal-grid{grid-template-columns:1fr}.terminal-body{min-height:240px;max-height:360px;font-size:.75rem}.boot-container{padding:1.2rem}.boot-footer{flex-direction:column;gap:.5rem}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LogicNest · 3D Creator Hub // MAX</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#05070a;--glass:rgba(12,17,23,.68);--line:rgba(130,255,220,.16);--mint:#70f5d2;--text:#e9fffa;--muted:#78918d}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+button{font:inherit}
+#space{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.vignette{position:fixed;inset:0;pointer-events:none;z-index:2;background:radial-gradient(circle at 52% 44%,transparent 16%,rgba(0,0,0,.08) 42%,rgba(0,0,0,.32) 72%,rgba(0,0,0,.88) 100%)}
+.atmosphere{position:fixed;inset:-20%;pointer-events:none;z-index:1;opacity:.5;background:conic-gradient(from 210deg at 50% 50%,transparent 0 18%,rgba(65,190,175,.025) 26%,transparent 34% 63%,rgba(95,180,255,.018) 72%,transparent 80%);animation:atmo 22s linear infinite}
+.noise{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.65'/%3E%3C/svg%3E")}
+@keyframes atmo{to{transform:rotate(360deg)}}
+.ui{position:relative;z-index:4;height:100%;pointer-events:none}
+.top{position:absolute;left:34px;right:34px;top:25px;display:flex;align-items:center;justify-content:space-between}
+.logo{pointer-events:auto;letter-spacing:.16em;font-weight:800;font-size:15px}.logo span{color:var(--mint)}
+.status{pointer-events:auto;color:#8ca7a1;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.status i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--mint);box-shadow:0 0 15px var(--mint);margin-right:7px}
+.hero{position:absolute;left:7vw;top:50%;transform:translateY(-50%);max-width:520px}
+.kicker{color:var(--mint);font-size:11px;letter-spacing:.28em;text-transform:uppercase;margin-bottom:18px}
+h1{font-size:clamp(48px,7vw,92px);line-height:.88;letter-spacing:-.065em}
+h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(232,255,249,.7)}
+.sub{margin-top:24px;max-width:470px;color:#91a8a4;line-height:1.65;font-size:15px}
+.actions{display:flex;gap:10px;margin-top:27px;pointer-events:auto}
+.btn{cursor:pointer;border:1px solid rgba(112,245,210,.25);background:rgba(10,19,21,.55);backdrop-filter:blur(14px);color:#eafff9;padding:12px 18px;border-radius:10px;transition:.2s}
+.btn:hover{border-color:var(--mint);box-shadow:0 0 28px rgba(112,245,210,.12);transform:translateY(-2px)}
+.btn.primary{background:var(--mint);color:#06110e;border-color:var(--mint);font-weight:800}
+.scene{position:absolute;right:7vw;top:50%;width:420px;height:420px;transform:translateY(-50%);perspective:1000px}
+.orb{position:absolute;left:50%;top:50%;width:180px;height:180px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 34% 28%,#d7fff4 0 3%,#54d6ba 10%,#0d3935 42%,#061012 72%);box-shadow:0 0 45px rgba(112,245,210,.3),inset -25px -25px 50px #020607;animation:float 5s ease-in-out infinite}
+.ring{position:absolute;left:50%;top:50%;border:1px solid rgba(112,245,210,.35);border-radius:50%;transform-style:preserve-3d}
+.r1{width:300px;height:100px;transform:translate(-50%,-50%) rotateX(65deg);animation:spin 12s linear infinite}
+.r2{width:350px;height:120px;transform:translate(-50%,-50%) rotateX(65deg) rotateZ(55deg);animation:spin 16s linear infinite reverse}
+.r3{width:260px;height:260px;transform:translate(-50%,-50%) rotateY(65deg);animation:spin 18s linear infinite}
+.card{position:absolute;width:185px;padding:15px;background:linear-gradient(145deg,rgba(18,31,34,.8),rgba(5,10,13,.72));border:1px solid rgba(112,245,210,.22);border-radius:14px;backdrop-filter:blur(12px);box-shadow:0 20px 60px rgba(0,0,0,.45);transition:.25s;cursor:pointer}
+.card:hover{border-color:var(--mint);transform:translateY(-6px) scale(1.03)}
+.c1{right:-15px;top:35px;transform:rotateY(-14deg) rotateZ(4deg)}.c2{left:-35px;bottom:42px;transform:rotateY(15deg) rotateZ(-4deg)}
+.card b{font-size:14px}.card small{display:block;color:#6f8985;margin-top:7px;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.card .line{height:2px;background:linear-gradient(90deg,var(--mint),transparent);margin-top:13px}
+.bottom{position:absolute;left:34px;right:34px;bottom:25px;display:flex;justify-content:space-between;align-items:end}
+.hint{color:#526a66;font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.nav{display:flex;gap:8px;pointer-events:auto}.nav button{cursor:pointer;color:#8da5a1;background:transparent;border:1px solid rgba(255,255,255,.08);padding:9px 13px;border-radius:9px}.nav button:hover{color:#fff;border-color:var(--line)}
+.panel{position:fixed;inset:0;z-index:8;background:rgba(2,5,7,.7);backdrop-filter:blur(18px);display:none;align-items:center;justify-content:center;padding:24px}.panel.open{display:flex}
+.panelbox{width:min(920px,95vw);max-height:85vh;overflow:auto;border:1px solid var(--line);border-radius:22px;background:rgba(8,13,17,.88);padding:28px;box-shadow:0 30px 100px #000}
+.panelhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.panelhead h2{font-size:24px}.close{cursor:pointer;background:none;border:0;color:#78918d;font-size:25px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.project{padding:20px;border:1px solid rgba(255,255,255,.08);border-radius:15px;background:rgba(255,255,255,.025);cursor:pointer;transition:.2s}.project:hover{border-color:var(--mint);transform:translateY(-3px)}.project h3{margin-bottom:7px}.project p{color:#718783;font-size:13px;line-height:1.5}.tag{display:inline-block;margin-top:14px;color:var(--mint);font-size:9px;letter-spacing:.15em;text-transform:uppercase}
+@keyframes float{50%{transform:translate(-50%,-54%) scale(1.03)}}@keyframes spin{to{transform:translate(-50%,-50%) rotateX(65deg) rotateZ(415deg)}}
+
+.floor{position:absolute;left:50%;top:76%;width:460px;height:180px;transform:translate(-50%,-50%) rotateX(68deg);background:linear-gradient(rgba(112,245,210,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(112,245,210,.08) 1px,transparent 1px);background-size:28px 28px;mask-image:radial-gradient(ellipse,black 20%,transparent 72%);opacity:.7}
+.gridglow{position:absolute;left:50%;top:79%;width:300px;height:50px;transform:translate(-50%,-50%);background:rgba(112,245,210,.18);filter:blur(25px);border-radius:50%}
+.beam{position:absolute;left:50%;top:50%;width:2px;height:340px;background:linear-gradient(transparent,rgba(112,245,210,.35),transparent);transform-origin:center;opacity:.5}
+.b1{transform:rotate(36deg)}.b2{transform:rotate(-36deg)}
+.screen{position:absolute;left:50%;top:50%;width:150px;height:105px;transform:translate(-50%,-50%) translateZ(45px) rotateY(-8deg);border:1px solid rgba(112,245,210,.28);border-radius:9px;background:linear-gradient(145deg,rgba(8,19,21,.94),rgba(2,7,9,.86));box-shadow:0 0 35px rgba(112,245,210,.1),inset 0 0 25px rgba(112,245,210,.05);padding:10px;overflow:hidden}
+.screen-top{display:flex;justify-content:space-between;color:#58746f;font:7px monospace;letter-spacing:.1em}.screen-top span:last-child{color:var(--mint)}
+.screen-big{font:700 48px monospace;line-height:1;margin-top:13px;color:#b8fff0;text-shadow:0 0 18px rgba(112,245,210,.4)}
+.screen-small{font:7px monospace;letter-spacing:.16em;color:#5b7772}.scan{position:absolute;left:0;right:0;height:1px;background:rgba(112,245,210,.5);box-shadow:0 0 8px var(--mint);animation:scan 3s linear infinite}
+.portal{position:absolute;width:80px;height:80px;border-radius:50%;border:1px solid rgba(112,245,210,.4);box-shadow:0 0 22px rgba(112,245,210,.13),inset 0 0 18px rgba(112,245,210,.08);display:grid;place-items:center;color:#9de9d7;font:700 9px monospace;letter-spacing:.15em;cursor:pointer;transition:.25s}
+.portal:hover{transform:scale(1.12);border-color:var(--mint);box-shadow:0 0 40px rgba(112,245,210,.25)}
+.p1{left:5%;top:28%;transform:rotateY(20deg)}.p2{right:4%;bottom:20%;transform:rotateY(-20deg)}
+@keyframes scan{0%{top:-2px}100%{top:110px}}
+@keyframes pulsePortal{50%{box-shadow:0 0 36px rgba(112,245,210,.22),inset 0 0 22px rgba(112,245,210,.1)}}
+.portal{animation:pulsePortal 2.8s ease-in-out infinite}
+.command-line{display:flex;gap:8px;margin-top:18px;border:1px solid rgba(112,245,210,.14);padding:11px;border-radius:10px;background:#05090b}
+.command-line span{color:var(--mint);font-family:monospace}.command-line input{flex:1;background:transparent;border:0;outline:0;color:#eafff9;font-family:monospace}
+.terminal-output{font-family:monospace;font-size:12px;line-height:1.7;color:#8ba7a2;max-height:390px;overflow:auto;padding:16px;background:#030607;border:1px solid rgba(255,255,255,.05);border-radius:12px}
+.terminal-output .ok{color:#70f5d2}.terminal-output .err{color:#ff8b8b}.terminal-output .dim{color:#49615d}
+
+
+.scene:before{content:"";position:absolute;inset:-40px;border:1px solid rgba(112,245,210,.035);border-radius:50%;transform:rotateX(72deg);box-shadow:0 0 80px rgba(112,245,210,.025);pointer-events:none}
+.cube{position:absolute;width:26px;height:26px;border:1px solid rgba(112,245,210,.24);background:rgba(112,245,210,.025);transform-style:preserve-3d;animation:cubefloat 7s ease-in-out infinite}
+.cube:before,.cube:after{content:"";position:absolute;inset:0;border:1px solid rgba(112,245,210,.13);transform:translateZ(26px)}
+.cube:after{transform:rotateY(90deg) translateZ(13px)}
+.cube-a{left:17%;top:18%;animation-delay:-1s}.cube-b{right:17%;top:63%;width:17px;height:17px;animation-delay:-4s}.cube-c{left:36%;bottom:7%;width:12px;height:12px;animation-delay:-2s}
+.data-orbit{position:absolute;left:50%;top:50%;border:1px dashed rgba(112,245,210,.12);border-radius:50%;transform-style:preserve-3d;animation:dataSpin 11s linear infinite}
+.data-orbit i{position:absolute;width:5px;height:5px;background:var(--mint);border-radius:50%;box-shadow:0 0 12px var(--mint)}
+.do1{width:390px;height:140px;transform:translate(-50%,-50%) rotateX(72deg)}.do1 i:nth-child(1){left:10%;top:47%}.do1 i:nth-child(2){left:48%;top:2%}.do1 i:nth-child(3){right:8%;top:51%}
+.do2{width:330px;height:330px;transform:translate(-50%,-50%) rotateY(70deg);animation-duration:15s;animation-direction:reverse}.do2 i:nth-child(1){left:4%;top:47%}.do2 i:nth-child(2){right:4%;top:47%}
+.mini-label{position:absolute;color:#52706a;font:8px monospace;letter-spacing:.17em;padding:5px 7px;border-left:1px solid rgba(112,245,210,.28);background:rgba(4,10,11,.35);backdrop-filter:blur(5px)}
+.ml1{left:4%;top:45%}.ml2{right:1%;top:32%}.ml3{right:9%;bottom:6%}
+.about-grid{display:grid;grid-template-columns:1.6fr .7fr .7fr;gap:14px;align-items:stretch}.about-grid>div:first-child,.stat{border:1px solid rgba(255,255,255,.07);border-radius:15px;padding:22px;background:rgba(255,255,255,.025)}
+.eyebrow{font:9px monospace;color:var(--mint);letter-spacing:.2em}.aboutbox h3{font-size:28px;margin:12px 0}.aboutbox p{color:#79908c;line-height:1.65;font-size:13px}.stat{display:flex;flex-direction:column;justify-content:center}.stat strong{font-size:34px;color:#d9fff6}.stat span{font:9px monospace;letter-spacing:.15em;color:#607b75;margin-top:5px}
+@keyframes cubefloat{0%,100%{transform:translate3d(0,0,0) rotateX(0) rotateY(0)}50%{transform:translate3d(10px,-18px,30px) rotateX(110deg) rotateY(140deg)}}@keyframes dataSpin{to{transform:translate(-50%,-50%) rotateX(72deg) rotateZ(360deg)}}
+
+@media(max-width:850px){.scene{right:2vw;opacity:.32}.mini-label,.cube,.data-orbit{display:none}.about-grid{grid-template-columns:1fr}.aboutbox h3{font-size:23px}.hero{left:7vw;right:7vw}.grid{grid-template-columns:1fr}.top{left:18px;right:18px}.bottom{left:18px;right:18px}.status{display:none}}
+</style>
 </head>
-<body data-theme="default">
-<canvas id="bg-canvas"></canvas>
-
-<div id="loading-overlay">
-  <div class="boot-container">
-    <div class="boot-header"><span class="brand-boot">LOGICNEST</span><span>v2.0 · roblox</span></div>
-    <div class="boot-logs" id="bootLogs"></div>
-    <div class="boot-progress"><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div><span class="progress-label" id="progressLabel">0%</span></div>
-    <div class="boot-footer"><span id="bootStatus"><span class="blink">■</span> initializing</span><span id="bootTime">--:--:--</span><button class="skip-btn" id="skipBootBtn">skip</button></div>
-  </div>
+<body>
+<canvas id="space"></canvas><div class="atmosphere"></div><div class="vignette"></div><div class="noise"></div>
+<div class="ui">
+<header class="top"><div class="logo">LOGIC<span>NEST</span> / 3D</div><div class="status"><i></i><span id="systemStatus">systems online</span> · creator hub</div></header>
+<main class="hero">
+<div class="kicker">Roblox creator · builder · scripter · designer</div>
+<h1>Build.<br><em>Create.</em><br>Explore.</h1>
+<p class="sub">A 3D home for LogicNest — projects, tools and everything I'm building, all in one place.</p>
+<div class="actions"><button class="btn primary" onclick="openProjects()">View projects</button><button class="btn" onclick="openTerminal()">Open console</button></div>
+</main>
+<div class="scene" id="scene">
+<div class="floor"></div><div class="gridglow"></div>
+<div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="orb"></div>
+<div class="beam b1"></div><div class="beam b2"></div>
+<div class="screen screen-main"><div class="screen-top"><span>LOGICNEST // CORE</span><span>ONLINE</span></div><div class="screen-big">04</div><div class="screen-small">PROJECTS DEPLOYED</div><div class="scan"></div></div>
+<div class="card c1" onclick="openProjects()"><b>QUICK REDIRECTS</b><small>04 live projects</small><div class="line"></div></div>
+<div class="card c2" onclick="openTerminal()"><b>LOGICNEST CORE</b><small>interactive console</small><div class="line"></div></div>
+<div class="portal p1" onclick="openProject('builder')"><span>BUILD</span></div>
+<div class="portal p2" onclick="openProject('scripter')"><span>SCRIPT</span></div>
+<div class="cube cube-a"></div><div class="cube cube-b"></div><div class="cube cube-c"></div>
+<div class="data-orbit do1"><i></i><i></i><i></i></div><div class="data-orbit do2"><i></i><i></i></div>
+<div class="mini-label ml1">BUILD / 01</div><div class="mini-label ml2">SCRIPT / 02</div>
+<div class="mini-label ml3">UI / 04</div>
+</div>
+<div class="bottom"><div class="hint">◈ neural space · move your mouse · explore the scene · click a terminal</div><nav class="nav"><button onclick="openProjects()">projects</button><button onclick="openTerminal()">console</button><button onclick="openAbout()">about</button><button onclick="toggleFullscreen()">fullscreen</button></nav></div>
 </div>
 
-<div class="container">
-  <div class="top-bar">
-    <div class="brand"><h1>LogicNest</h1><span class="badge">creator hub</span></div>
-    <div class="status-chip"><i class="fas fa-circle"></i> <span id="clockDisplay">--:--:--</span> <span style="margin-left:.5rem">online</span></div>
-    <div class="theme-selector"><span>theme</span>
-      <button class="theme-btn active" data-theme="default">d</button>
-      <button class="theme-btn" data-theme="night">n</button>
-      <button class="theme-btn" data-theme="forest">f</button>
-      <button class="theme-btn" data-theme="ocean">o</button>
-      <button class="theme-btn" data-theme="sunset">s</button>
-      <button class="theme-btn" data-theme="lavender">l</button>
-      <button class="theme-btn" data-theme="grayscale">g</button>
-      <button class="theme-btn" data-theme="muted">m</button>
-    </div>
-  </div>
-
-  <div class="mode-switch">
-    <button class="mode-btn active" data-mode="console">console</button>
-    <button class="mode-btn" data-mode="redirects">quick redirects</button>
-    <button class="mode-btn" data-mode="tools">tools</button>
-  </div>
-
-  <div class="view active" id="consoleView">
-    <div class="terminal-main">
-      <div class="terminal-header"><div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><span class="title">terminal · logicnest</span></div>
-      <div class="terminal-body" id="terminalBody">
-        <div class="terminal-output"><span class="dim">╔══════════════════════════════════╗</span></div>
-        <div class="terminal-output"><span class="dim">║  LogicNest Roblox Creator Hub    ║</span></div>
-        <div class="terminal-output"><span class="dim">║  Type <span class="highlight">/help</span> for commands       ║</span></div>
-        <div class="terminal-output"><span class="dim">╚══════════════════════════════════╝</span></div>
-        <div class="terminal-input-line"><span class="terminal-prompt">➜</span><input class="terminal-input" id="terminalInput" placeholder="enter command..." autofocus></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="view" id="redirectsView">
-    <div class="normal-grid">
-      <div class="tool-card"><h3>Project quicklinks</h3><p>Open your Roblox projects</p><div class="card-list" id="projectList"></div></div>
-      <div class="tool-card"><h3>Utility</h3><p>JSON, base64, timestamp, color converter</p>
-        <div class="tool-row"><select id="utilitySelect"><option value="json">JSON format</option><option value="base64">Base64 encode</option><option value="decode64">Base64 decode</option><option value="timestamp">Timestamp</option><option value="color">HEX to RGB</option></select></div>
-        <div class="tool-row"><input id="utilityInput" placeholder="input"><button id="utilityRun">Run</button></div>
-        <div class="result" id="utilityResult">ready</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="view" id="toolsView">
-    <div class="normal-grid">
-      <div class="tool-card"><h3>User lookup</h3><p>Find Roblox user by username</p><div class="tool-row"><input id="userInput" placeholder="username"><button id="userSearch">Search</button></div><div class="result" id="userResult">awaiting input</div></div>
-      <div class="tool-card"><h3>Group search</h3><p>Search Roblox groups by name</p><div class="tool-row"><input id="groupInput" placeholder="group name"><button id="groupSearch">Search</button></div><div class="result" id="groupResult">awaiting input</div></div>
-      <div class="tool-card"><h3>Game lookup</h3><p>Find Roblox game by name</p><div class="tool-row"><input id="gameInput" placeholder="game name"><button id="gameSearch">Search</button></div><div class="result" id="gameResult">awaiting input</div></div>
-      <div class="tool-card"><h3>Asset lookup</h3><p>Get details by asset ID</p><div class="tool-row"><input id="assetInput" placeholder="asset id"><button id="assetSearch">Search</button></div><div class="result" id="assetResult">awaiting input</div></div>
-    </div>
-  </div>
-
-  <div class="contact-mini"><span class="label"><i class="fas fa-envelope"></i> contact / suggest</span><div style="display:flex;gap:.6rem;flex-wrap:wrap"><button class="action-btn" id="contactBtn">send message</button><button class="action-btn" id="suggestBtn">suggest</button><button class="action-btn" id="clearBtn">clear</button></div></div>
-  <div class="footer"><span>2026 LOGICNEST // ALL SYSTEMS OPERATIONAL</span><span class="highlight"><i class="fas fa-circle" style="font-size:.3rem"></i> <span id="footerTime">--:--:--</span></span></div>
-</div>
-
-<div class="modal-overlay" id="contactModal"><div class="modal-box"><button class="close-modal" onclick="closeModal('contactModal')"><i class="fas fa-times"></i></button><h2><i class="fas fa-paper-plane"></i> Send Message</h2><form id="contactForm"><input type="text" id="contactName" placeholder="Your name (optional)"><input type="email" id="contactEmail" placeholder="Your email (optional)"><textarea id="contactMessage" placeholder="What's on your mind?"></textarea><button type="submit" class="submit-btn">Send</button></form></div></div>
-<div class="modal-overlay" id="suggestModal"><div class="modal-box"><button class="close-modal" onclick="closeModal('suggestModal')"><i class="fas fa-times"></i></button><h2><i class="fas fa-lightbulb"></i> Submit Suggestion</h2><form id="suggestForm"><input type="text" id="suggestName" placeholder="Your name (optional)"><input type="email" id="suggestEmail" placeholder="Your email (optional)"><textarea id="suggestText" placeholder="Describe your idea or bug..."></textarea><button type="submit" class="submit-btn">Submit</button></form></div></div>
+<div class="panel" id="projectsPanel" onclick="if(event.target===this)closePanel('projectsPanel')"><div class="panelbox"><div class="panelhead"><h2>Quick Redirects</h2><button class="close" onclick="closePanel('projectsPanel')">×</button></div><div class="grid" id="projectGrid"></div></div></div>
+<div class="panel" id="terminalPanel" onclick="if(event.target===this)closePanel('terminalPanel')"><div class="panelbox"><div class="panelhead"><h2>LogicNest Console</h2><button class="close" onclick="closePanel('terminalPanel')">×</button></div><div class="terminal-output" id="terminalOutput"><div><span class="ok">LOGICNEST CORE v4.0</span></div><div class="dim">3D portfolio shell loaded.</div><div>Type <span class="ok">/help</span> to see commands.</div></div><div class="command-line"><span>➜</span><input id="commandInput" autocomplete="off" placeholder="enter command..."></div></div></div>
+<div class="panel" id="aboutPanel" onclick="if(event.target===this)closePanel('aboutPanel')"><div class="panelbox aboutbox"><div class="panelhead"><h2>About LogicNest</h2><button class="close" onclick="closePanel('aboutPanel')">×</button></div><div class="about-grid"><div><span class="eyebrow">CREATOR PROFILE</span><h3>Builder. Scripter. Designer.</h3><p>A compact digital space for the work behind LogicNest. Explore projects, tools and experiments through an interactive 3D interface.</p></div><div class="stat"><strong>04</strong><span>LIVE PROJECTS</span></div><div class="stat"><strong>03D</strong><span>INTERFACE</span></div></div></div></div>
 
 <script>
 const projects=[
@@ -122,167 +124,126 @@ const projects=[
 {id:"clothing",name:"LogicNest Clothing",tag:"clothing",url:"https://logicnesttt.vercel.app/",desc:"Roblox clothing designer — premium shirts, pants & outfit collections."},
 {id:"ui",name:"LogicNest UI",tag:"ui",url:"https://logicnestui.vercel.app/",desc:"LogicNest UI — user interface designs, showcases & projects."}
 ];
+const grid=document.getElementById("projectGrid");
+grid.innerHTML=projects.map(p=>`<div class="project" onclick="window.open('${p.url}','_blank')"><h3>${p.name}</h3><p>${p.desc}</p><span class="tag">${p.tag} · live ↗</span></div>`).join("");
+function openProjects(){document.getElementById("projectsPanel").classList.add("open")}
+function openTerminal(){document.getElementById("terminalPanel").classList.add("open");setTimeout(()=>commandInput.focus(),80)}
+function openAbout(){document.getElementById("aboutPanel").classList.add("open")}
+function closePanel(id){document.getElementById(id).classList.remove("open")}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closePanel("projectsPanel");closePanel("terminalPanel");closePanel("aboutPanel")}});
+addEventListener("keydown",e=>{if(e.key==="/" && document.activeElement!==commandInput){e.preventDefault();openTerminal()}});
+setTimeout(()=>{document.getElementById("systemStatus").textContent="all systems nominal"},1400);
 
-const terminalBody=document.getElementById("terminalBody"),terminalInput=document.getElementById("terminalInput");
-const modeButtons=document.querySelectorAll(".mode-btn");
-modeButtons.forEach(btn=>btn.addEventListener("click",()=>switchMode(btn.dataset.mode)));
-function switchMode(mode){
-modeButtons.forEach(b=>b.classList.toggle("active",b.dataset.mode===mode));
-document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-document.getElementById(mode+"View").classList.add("active");
-localStorage.setItem("logicnest-mode",mode);
-if(mode==="console")setTimeout(()=>terminalInput.focus(),50);
+
+function openProject(id){const p=projects.find(x=>x.id===id);if(p)window.open(p.url,"_blank")}
+function toggleFullscreen(){if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()}
+const output=document.getElementById("terminalOutput"),commandInput=document.getElementById("commandInput");
+function termWrite(text,cls=""){const d=document.createElement("div");if(cls)d.className=cls;d.innerHTML=text;output.appendChild(d);output.scrollTop=output.scrollHeight}
+function runCommand(raw){
+ const v=raw.trim(); if(!v)return;
+ termWrite(`<span class="dim">➜</span> ${escapeHtml(v)}`);
+ const [cmd,...args]=v.split(/\s+/); const c=cmd.toLowerCase();
+ if(c==="/help"||c==="help"){termWrite(`<span class="ok">Commands</span><br>/help · /projects · /open [project] · /status · /whoami · /clear · /theme [mint|mono]`)}
+ else if(c==="/projects"||c==="projects"){projects.forEach((p,i)=>termWrite(`${i+1}. <span class="ok">${p.name}</span> <span class="dim">[${p.tag}]</span>`))}
+ else if(c==="/open"||c==="open"){const q=args.join(" ").toLowerCase();const p=projects.find(x=>x.id===q||x.tag===q||x.name.toLowerCase().includes(q));if(p){termWrite(`<span class="ok">Opening ${escapeHtml(p.name)}...</span>`);openProject(p.id)}else termWrite("Project not found.","err")}
+ else if(c==="/status"||c==="status"){termWrite(`<span class="ok">● ALL SYSTEMS OPERATIONAL</span><br>projects: 4<br>3D engine: online<br>scene: active<br>portfolio: deployed<br>render: <span class="ok">adaptive</span>`)}
+ else if(c==="/about"||c==="about"){openAbout();termWrite(`<span class="ok">Opening creator profile...</span>`)}
+ else if(c==="/whoami"||c==="whoami"){termWrite(`visitor@logicnest<br><span class="dim">role:</span> guest<br><span class="dim">environment:</span> 3D portfolio`)}
+ else if(c==="/clear"||c==="clear"){output.innerHTML=""}
+ else if(c==="/theme"){document.documentElement.style.setProperty("--mint",args[0]==="mono"?"#c8d0ce":"#70f5d2");termWrite(`<span class="ok">Theme updated.</span>`)}
+ else termWrite(`Unknown command: ${escapeHtml(v)} · type /help`,"err");
 }
-switchMode(localStorage.getItem("logicnest-mode")||"console");
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+commandInput.addEventListener("keydown",e=>{if(e.key==="Enter"){runCommand(commandInput.value);commandInput.value=""} });
+document.getElementById("terminalPanel").addEventListener("click",()=>setTimeout(()=>commandInput.focus(),30));
 
-function appendOutput(html){
-const div=document.createElement("div");
-div.className="terminal-output";
-div.innerHTML=html;
-terminalBody.insertBefore(div,terminalBody.lastElementChild);
-terminalBody.scrollTop=terminalBody.scrollHeight;
+const canvas=document.getElementById("space"),ctx=canvas.getContext("2d");
+let w,h,stars=[],dust=[],nebula=[],mouseX=.5,mouseY=.5;
+function resize(){
+  w=innerWidth;h=innerHeight;
+  canvas.width=w*devicePixelRatio;canvas.height=h*devicePixelRatio;
+  canvas.style.width=w+"px";canvas.style.height=h+"px";
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
 }
-
-function projectHTML(){
-return projects.map((p,i)=>`<div class="mini-card"><div style="flex:1"><strong>${i+1}. ${p.name}</strong><small>${p.tag} · live</small></div><button onclick="window.open('${p.url}','_blank')">Open</button></div>`).join("");
+function init(){
+  stars=Array.from({length:260},()=>({
+    x:Math.random()*w,y:Math.random()*h,z:Math.random(),
+    s:Math.random()*1.7+.15,tw:Math.random()*Math.PI*2
+  }));
+  dust=Array.from({length:85},()=>({
+    x:Math.random()*w,y:Math.random()*h,
+    r:Math.random()*2.4+.3,a:Math.random()*.3+.05,
+    dx:(Math.random()-.5)*.08,dy:(Math.random()-.5)*.08
+  }));
+  nebula=Array.from({length:9},()=>({
+    x:Math.random()*w,y:Math.random()*h,
+    r:Math.random()*260+170,
+    a:Math.random()*.055+.018,
+    drift:Math.random()*Math.PI*2
+  }));
 }
-document.getElementById("projectList").innerHTML=projectHTML();
-
-function processCommand(cmd){
-const trimmed=cmd.trim();
-if(!trimmed){appendOutput("&nbsp;");return}
-const parts=trimmed.split(/\s+/),command=parts[0].toLowerCase(),args=parts.slice(1);
-
-if(command==="/help"||command==="help"){
-appendOutput(`<span class="highlight">Available commands</span><br><span class="dim">/help /projects /project [name] /open [name] /user [username] /group [name] /game [name] /asset [id] /contact /suggest /theme [name] /status /clear /whoami /echo [text] /mode [console|redirects|tools] /exit</span>`);return}
-if(command==="/projects"||command==="projects"){appendOutput(projects.map((p,i)=>`${i+1}. <span class="project-name">${p.name}</span> <span class="tag">[${p.tag}]</span> <span class="success">live</span>`).join("<br>"));return}
-if((command==="/project"||command==="project")&&args.length){const q=args.join(" ").toLowerCase(),p=projects.find(x=>x.id.toLowerCase()===q)||projects.find(x=>x.name.toLowerCase()===q)||projects.find(x=>x.tag.toLowerCase()===q)||projects.find(x=>x.name.toLowerCase().includes(q)||x.id.toLowerCase().includes(q)||x.tag.toLowerCase().includes(q));appendOutput(p?`<span class="highlight">${p.name}</span><br><span class="dim">id:</span> ${p.id}<br><span class="dim">tag:</span> ${p.tag}<br><span class="dim">desc:</span> ${p.desc}<br><span class="link" onclick="window.open('${p.url}','_blank')">${p.url}</span>`:`<span class="error">Project not found.</span>`);return}
-
-if(command==="/open"&&args.length){const q=args.join(" ").toLowerCase(),p=projects.find(x=>x.id.toLowerCase()===q)||projects.find(x=>x.name.toLowerCase()===q)||projects.find(x=>x.tag.toLowerCase()===q)||projects.find(x=>x.name.toLowerCase().includes(q)||x.id.toLowerCase().includes(q)||x.tag.toLowerCase().includes(q));if(p){window.open(p.url,"_blank");appendOutput(`<span class="success">Opening ${p.name}...</span>`)}else appendOutput(`<span class="error">Project not found.</span>`);return}
-if(command==="/user"||command==="user"){if(!args.length){appendOutput(`<span class="error">Usage: /user [username]</span>`);return}lookupUser(args.join(" "));return}
-if(command==="/group"||command==="group"){if(!args.length){appendOutput(`<span class="error">Usage: /group [name]</span>`);return}lookupGroup(args.join(" "));return}
-if(command==="/game"||command==="game"){if(!args.length){appendOutput(`<span class="error">Usage: /game [name]</span>`);return}lookupGame(args.join(" "));return}
-if(command==="/asset"||command==="asset"){if(!args.length){appendOutput(`<span class="error">Usage: /asset [id]</span>`);return}lookupAsset(args[0]);return}
-if(command==="/contact"||command==="contact"){openModal("contactModal");return}
-if(command==="/suggest"||command==="suggest"){openModal("suggestModal");return}
-if(command==="/clear"||command==="clear"){terminalBody.querySelectorAll(".terminal-output").forEach(x=>x.remove());appendOutput(`<span class="dim">Terminal cleared.</span>`);return}
-if(command==="/whoami"||command==="whoami"){appendOutput(`<span class="dim">user:</span> visitor@logicnest<br><span class="dim">shell:</span> /bin/console<br><span class="dim">home:</span> /roblox-creator`);return}
-if(command==="/echo"&&args.length){appendOutput(`<span class="dim">→</span> ${args.join(" ")}`);return}
-if(command==="/mode"&&args.length){if(["console","redirects","tools"].includes(args[0].toLowerCase()))switchMode(args[0].toLowerCase());else appendOutput(`<span class="error">Available modes: console, redirects, tools</span>`);return}
-if(command==="/theme"&&args.length){setTheme(args[0].toLowerCase());return}
-if(command==="/status"||command==="status"){appendOutput(`<span class="success">● all systems operational</span><br><span class="dim">projects:</span> ${projects.length}<br><span class="dim">mode:</span> ${localStorage.getItem("logicnest-mode")||"console"}<br><span class="dim">theme:</span> ${document.body.dataset.theme||"default"}`);return}
-if(command==="/exit"||command==="exit"){appendOutput(`<span class="dim">Session reset.</span>`);return}
-appendOutput(`<span class="error">Unknown command: "${trimmed}"</span><br><span class="dim">Type /help for available commands.</span>`);
+function glowDot(x,y,r,a){
+  const g=ctx.createRadialGradient(x,y,0,x,y,r);
+  g.addColorStop(0,`rgba(112,245,210,${a})`);
+  g.addColorStop(.28,`rgba(62,178,160,${a*.34})`);
+  g.addColorStop(1,"rgba(0,0,0,0)");
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
 }
+function draw(){
+  ctx.clearRect(0,0,w,h);
 
-const commandHistory=[],historyIndex={value:-1};
-terminalInput.addEventListener("keydown",e=>{
-if(e.key==="Enter"){const cmd=terminalInput.value.trim();if(cmd){commandHistory.push(cmd);historyIndex.value=commandHistory.length}appendOutput(`<span class="dim">➜</span> <span class="highlight">${cmd}</span>`);processCommand(cmd);terminalInput.value=""}
-if(e.key==="ArrowUp"){e.preventDefault();if(commandHistory.length){historyIndex.value=Math.max(0,historyIndex.value-1);terminalInput.value=commandHistory[historyIndex.value]}}
-if(e.key==="ArrowDown"){e.preventDefault();if(commandHistory.length){historyIndex.value=Math.min(commandHistory.length,historyIndex.value+1);terminalInput.value=commandHistory[historyIndex.value]||""}}
-if(e.key==="Tab"){e.preventDefault();const commands=["/help","/projects","/project","/open","/user","/group","/game","/asset","/contact","/suggest","/theme","/status","/clear","/whoami","/echo","/mode","/exit"];const q=terminalInput.value.toLowerCase();const found=commands.find(x=>x.startsWith(q)&&x!==q);if(found)terminalInput.value=found}
-});
+  // Deep-space gradient
+  const bg=ctx.createRadialGradient(w*.52,h*.48,0,w*.52,h*.48,Math.max(w,h)*.75);
+  bg.addColorStop(0,"#0b1719");bg.addColorStop(.42,"#071014");
+  bg.addColorStop(1,"#020406");
+  ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
 
-async function lookupUser(username){
-appendOutput(`<span class="dim">Searching Roblox user:</span> ${username}...`);
-try{
-const r=await fetch("https://users.roblox.com/v1/usernames/users",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({usernames:[username],excludeBannedUsers:false})});
-const d=await r.json();const u=d.data&&d.data[0];
-if(!u){appendOutput(`<span class="error">User not found.</span>`);return}
-const t=await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${u.id}&size=150x150&format=Png&isCircular=false`);const td=await t.json();const image=td.data&&td.data[0]&&td.data[0].imageUrl;
-appendOutput(`<span class="success">User found</span><br>username: ${u.name}<br>display: ${u.displayName}<br>id: ${u.id}<br><span class="link" onclick="window.open('https://www.roblox.com/users/${u.id}/profile','_blank')">Open Roblox profile</span>`);
-if(image)showNormalResult("userResult",`<div class="profile"><img src="${image}"><div><strong>${u.displayName}</strong><br><span class="dim">@${u.name}</span><br><span class="dim">ID ${u.id}</span></div></div>`);
-}catch(e){appendOutput(`<span class="error">Roblox API request failed.</span>`)}
+  // Soft nebula clouds with mouse parallax
+  for(const n of nebula){
+    n.drift+=.0009;
+    const px=(mouseX-.5)*18,py=(mouseY-.5)*12;
+    glowDot(n.x+Math.sin(n.drift)*18+px,n.y+Math.cos(n.drift*.8)*14+py,n.r,n.a);
+  }
+
+  // Tiny drifting dust
+  for(const p of dust){
+    p.x+=p.dx;p.y+=p.dy;
+    if(p.x<0)p.x=w;if(p.x>w)p.x=0;if(p.y<0)p.y=h;if(p.y>h)p.y=0;
+    ctx.fillStyle=`rgba(120,210,198,${p.a})`;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+  }
+
+  // Perspective stars
+  for(const p of stars){
+    p.z-=.00055;if(p.z<0)p.z=1;
+    p.tw+=.025;
+    const px=(mouseX-.5)*p.z*25,py=(mouseY-.5)*p.z*18;
+    const x=(p.x-w/2)*(1/p.z)*.035+w/2+px;
+    const y=(p.y-h/2)*(1/p.z)*.035+h/2+py;
+    const a=Math.max(.08,(1-p.z)*.8)*(0.72+Math.sin(p.tw)*.28);
+    ctx.fillStyle=`rgba(190,255,244,${a})`;
+    ctx.fillRect(x,y,p.s,p.s);
+    if(p.z<.2){
+      ctx.strokeStyle=`rgba(112,245,210,${a*.25})`;
+      ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-(p.x-w/2)*.008,y-(p.y-h/2)*.008);ctx.stroke();
+    }
+  }
+
+  // Subtle horizon glow behind the scene
+  const hg=ctx.createRadialGradient(w*.72,h*.67,0,w*.72,h*.67,260);
+  hg.addColorStop(0,"rgba(112,245,210,.12)");
+  hg.addColorStop(1,"rgba(112,245,210,0)");
+  ctx.fillStyle=hg;ctx.fillRect(0,0,w,h);
+
+  requestAnimationFrame(draw);
 }
+resize();init();draw();
+addEventListener("resize",()=>{resize();init()});
+addEventListener("mousemove",e=>{mouseX=e.clientX/innerWidth;mouseY=e.clientY/innerHeight});
 
-async function lookupGroup(name){
-const box=document.getElementById("groupResult");box.textContent="Searching...";
-try{
-const r=await fetch(`https://groups.roblox.com/v1/groups/search?keyword=${encodeURIComponent(name)}&limit=10`);const d=await r.json();
-if(!d.data?.length){box.textContent="No groups found.";return}
-box.innerHTML=d.data.map(g=>`<div class="mini-card"><div style="flex:1"><strong>${escapeHTML(g.name)}</strong><small>ID ${g.id} · ${g.memberCount||0} members</small></div><button onclick="window.open('https://www.roblox.com/communities/${g.id}','_blank')">Open</button></div>`).join("");
-}catch(e){box.textContent="Group API request failed."}
-}
-
-async function lookupGame(name){
-const box=document.getElementById("gameResult");box.textContent="Searching...";
-try{
-const r=await fetch(`https://games.roblox.com/v1/games/list?model.keyword=${encodeURIComponent(name)}&model.maxRows=10`);const d=await r.json();
-if(!d.games?.length){box.textContent="No games found.";return}
-box.innerHTML=d.games.map(g=>`<div class="mini-card"><div style="flex:1"><strong>${escapeHTML(g.name)}</strong><small>Place ID ${g.placeId}</small></div><button onclick="window.open('https://www.roblox.com/games/${g.placeId}','_blank')">Open</button></div>`).join("");
-}catch(e){box.textContent="Game API request failed. Try another game name."}
-}
-
-async function lookupAsset(id){
-const box=document.getElementById("assetResult");box.textContent="Searching...";
-if(!/^\d+$/.test(id)){box.textContent="Enter a numeric asset ID.";return}
-try{
-const r=await fetch(`https://economy.roblox.com/v2/assets/${id}/details`);const d=await r.json();
-box.innerHTML=`<strong>${escapeHTML(d.Name||"Unknown asset")}</strong><br><span class="dim">ID:</span> ${id}<br><span class="dim">Type:</span> ${escapeHTML(d.AssetType||"Unknown")}<br><span class="dim">Creator:</span> ${escapeHTML(d.Creator?.Name||"Unknown")}<br><button style="margin-top:.6rem" onclick="window.open('https://www.roblox.com/catalog/${id}','_blank')">Open catalog</button>`;
-}catch(e){box.textContent="Asset lookup failed or the asset is unavailable."}
-}
-
-function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function showNormalResult(id,html){document.getElementById(id).innerHTML=html}
-
-document.getElementById("userSearch").onclick=()=>{const v=document.getElementById("userInput").value.trim();if(v)lookupUser(v)};
-document.getElementById("groupSearch").onclick=()=>{const v=document.getElementById("groupInput").value.trim();if(v)lookupGroup(v)};
-document.getElementById("gameSearch").onclick=()=>{const v=document.getElementById("gameInput").value.trim();if(v)lookupGame(v)};
-document.getElementById("assetSearch").onclick=()=>{const v=document.getElementById("assetInput").value.trim();if(v)lookupAsset(v)};
-["userInput","groupInput","gameInput","assetInput"].forEach(id=>document.getElementById(id).addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById(id.replace("Input","Search")).click()}));
-
-document.getElementById("utilityRun").onclick=()=>{
-const type=document.getElementById("utilitySelect").value,v=document.getElementById("utilityInput").value,out=document.getElementById("utilityResult");
-try{
-if(type==="json")out.textContent=JSON.stringify(JSON.parse(v),null,2);
-if(type==="base64")out.textContent=btoa(unescape(encodeURIComponent(v)));
-if(type==="decode64")out.textContent=decodeURIComponent(escape(atob(v)));
-if(type==="timestamp")out.textContent=v?new Date(Number(v)*1000).toLocaleString():Math.floor(Date.now()/1000);
-if(type==="color"){const x=v.trim().replace("#","");if(!/^[0-9a-fA-F]{6}$/.test(x))throw Error();out.textContent=`rgb(${parseInt(x.slice(0,2),16)}, ${parseInt(x.slice(2,4),16)}, ${parseInt(x.slice(4,6),16)})`}
-}catch(e){out.textContent="Invalid input."}
-};
-
-const themeList=["default","grayscale","night","muted","sunset","forest","ocean","lavender"];
-function setTheme(t){if(!themeList.includes(t))return;document.body.dataset.theme=t;localStorage.setItem("logicnest-theme",t);document.querySelectorAll(".theme-btn").forEach(b=>b.classList.toggle("active",b.dataset.theme===t))}
-setTheme(localStorage.getItem("logicnest-theme")||"default");
-document.querySelectorAll(".theme-btn").forEach(b=>b.onclick=()=>setTheme(b.dataset.theme));
-
-function openModal(id){document.getElementById(id).classList.add("active")}window.openModal=openModal;
-function closeModal(id){document.getElementById(id).classList.remove("active")}window.closeModal=closeModal;
-document.querySelectorAll(".modal-overlay").forEach(x=>x.addEventListener("click",e=>{if(e.target===x)x.classList.remove("active")}));
-document.getElementById("contactBtn").onclick=()=>openModal("contactModal");
-document.getElementById("suggestBtn").onclick=()=>openModal("suggestModal");
-document.getElementById("clearBtn").onclick=()=>{terminalBody.querySelectorAll(".terminal-output").forEach(x=>x.remove());appendOutput(`<span class="dim">Terminal cleared.</span>`);terminalInput.focus()};
-document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".modal-overlay.active").forEach(x=>x.classList.remove("active"))});
-
-async function submitForm(type){
-const prefix=type==="contact"?"contact":"suggest",text=document.getElementById(prefix+(type==="contact"?"Message":"Text")).value.trim();
-if(!text){appendOutput(`<span class="error">Please enter a message.</span>`);return}
-const name=document.getElementById(prefix+"Name").value.trim(),email=document.getElementById(prefix+"Email").value.trim();
-const payload=type==="contact"?{name:name||"Anonymous",email:email||"Not provided",message:text,type,timestamp:new Date().toISOString()}:{name:name||"Anonymous",email:email||"Not provided",suggestion:text,type,timestamp:new Date().toISOString()};
-const id=type==="contact"?"Aq3b7yE115cHd7G":"wlWMqUAMKbhMV52";
-try{const r=await fetch(`https://sentinelhook.lol/api.php?id=${id}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});if(!r.ok)throw Error();appendOutput(`<span class="success">${type==="contact"?"Message":"Suggestion"} sent successfully.</span>`);closeModal(prefix+"Modal");document.getElementById(type==="contact"?"contactForm":"suggestForm").reset()}catch(e){appendOutput(`<span class="error">Failed to send. Please try again.</span>`)}
-}
-document.getElementById("contactForm").onsubmit=e=>{e.preventDefault();submitForm("contact")};
-document.getElementById("suggestForm").onsubmit=e=>{e.preventDefault();submitForm("suggestion")};
-
-const canvas=document.getElementById("bg-canvas"),ctx=canvas.getContext("2d");let width,height,particles=[];
-const colors={default:["95,191,168","60,150,130"],grayscale:["160,160,160","100,100,100"],night:["80,140,200","40,90,150"],muted:["150,140,130","110,100,90"],sunset:["210,130,110","180,90,70"],forest:["80,170,120","50,130,80"],ocean:["70,160,200","40,120,160"],lavender:["160,120,200","130,80,170"]};
-function resize(){width=innerWidth;height=innerHeight;canvas.width=width;canvas.height=height}
-function init(){particles=Array.from({length:90},()=>({x:Math.random()*width,y:Math.random()*height,s:Math.random()*2+.7,dx:(Math.random()-.5)*.5,dy:(Math.random()-.5)*.5,o:Math.random()*.4+.1}))}
-function animate(){ctx.clearRect(0,0,width,height);const c=colors[document.body.dataset.theme||"default"];for(const p of particles){p.x+=p.dx;p.y+=p.dy;if(p.x<0||p.x>width)p.dx*=-1;if(p.y<0||p.y>height)p.dy*=-1;const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.s*3);g.addColorStop(0,`rgba(${c[0]},${p.o+.2})`);g.addColorStop(1,`rgba(${c[1]},0)`);ctx.fillStyle=g;ctx.beginPath();ctx.arc(p.x,p.y,p.s*2.5,0,Math.PI*2);ctx.fill()}for(let i=0;i<particles.length;i++)for(let j=i+1;j<particles.length;j++){const a=particles[i],b=particles[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);if(d<140){ctx.strokeStyle=`rgba(${c[0]},${(1-d/140)*.15})`;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}}requestAnimationFrame(animate)}
-resize();init();animate();addEventListener("resize",()=>{resize();init()});
-
-const overlay=document.getElementById("loading-overlay"),bootLogs=document.getElementById("bootLogs"),fill=document.getElementById("progressFill"),label=document.getElementById("progressLabel"),status=document.getElementById("bootStatus"),skip=document.getElementById("skipBootBtn");
-const boot=["INITIALIZING SYSTEM CORE...","CPU: browser runtime detected","RAM: interface memory check PASSED","NETWORK: connection established","LOADING LOGICNEST CORE...","LOADING TERMINAL DRIVER...","LOADING REDIRECTS INTERFACE...","LOADING TOOLKIT...","LOADING THEME ENGINE...","SYSTEM READY · all subsystems operational"];
-let bi=0,bt;
-function bootLog(m,c="info"){const d=document.createElement("div");d.className="log-line";d.innerHTML=`<span class="timestamp">[${new Date().toTimeString().split(" ")[0]}]</span> <span class="${c}">${m}</span>`;bootLogs.appendChild(d);bootLogs.scrollTop=bootLogs.scrollHeight}
-function finishBoot(){clearTimeout(bt);fill.style.width="100%";label.textContent="100%";status.innerHTML='<span class="highlight">SYSTEM READY</span>';setTimeout(()=>overlay.classList.add("hidden"),350)}
-function runBoot(){if(bi<boot.length){bootLog(boot[bi],bi>7?"highlight":bi===9?"success":"info");const p=((bi+1)/boot.length)*100;fill.style.width=p+"%";label.textContent=Math.round(p)+"%";bi++;bt=setTimeout(runBoot,180)}else finishBoot()}
-skip.onclick=()=>{boot.slice(bi).forEach(x=>bootLog(x,"dim"));finishBoot()};setTimeout(runBoot,300);
-
-function clock(){const t=new Date().toTimeString().split(" ")[0];document.getElementById("clockDisplay").textContent=t;document.getElementById("footerTime").textContent=t;document.getElementById("bootTime").textContent=t}
-clock();setInterval(clock,1000);
+const scene=document.getElementById("scene");let tx=0,ty=0;
+addEventListener("mousemove",e=>{tx=(e.clientX/innerWidth-.5)*18;ty=(e.clientY/innerHeight-.5)*12;scene.style.transform=`translateY(-50%) rotateX(${-ty/3}deg) rotateY(${tx/3}deg)`});
+document.querySelectorAll(".card,.portal,.screen").forEach(el=>el.addEventListener("mousemove",e=>{const r=el.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;el.style.transform=`perspective(500px) rotateX(${-y*10}deg) rotateY(${x*12}deg) translateZ(8px)`}));
+document.querySelectorAll(".card,.portal,.screen").forEach(el=>el.addEventListener("mouseleave",()=>{el.style.transform=""}));
 </script>
-</body>
-</html>
+</body></html>
