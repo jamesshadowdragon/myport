@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LogicNest · 3D Creator Hub
+<title>LogicNest · 3D Creator Hub // MAX</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#05070a;--glass:rgba(12,17,23,.68);--line:rgba(130,255,220,.16);--mint:#70f5d2;--text:#e9fffa;--muted:#78918d}
@@ -192,17 +192,20 @@ function glowDot(x,y,r,a){
 function draw(){
   ctx.clearRect(0,0,w,h);
 
+  // Deep-space gradient
   const bg=ctx.createRadialGradient(w*.52,h*.48,0,w*.52,h*.48,Math.max(w,h)*.75);
   bg.addColorStop(0,"#0b1719");bg.addColorStop(.42,"#071014");
   bg.addColorStop(1,"#020406");
   ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
 
+  // Soft nebula clouds with mouse parallax
   for(const n of nebula){
     n.drift+=.0009;
     const px=(mouseX-.5)*18,py=(mouseY-.5)*12;
     glowDot(n.x+Math.sin(n.drift)*18+px,n.y+Math.cos(n.drift*.8)*14+py,n.r,n.a);
   }
 
+  // Tiny drifting dust
   for(const p of dust){
     p.x+=p.dx;p.y+=p.dy;
     if(p.x<0)p.x=w;if(p.x>w)p.x=0;if(p.y<0)p.y=h;if(p.y>h)p.y=0;
@@ -210,6 +213,7 @@ function draw(){
     ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
   }
 
+  // Perspective stars
   for(const p of stars){
     p.z-=.00055;if(p.z<0)p.z=1;
     p.tw+=.025;
@@ -225,6 +229,7 @@ function draw(){
     }
   }
 
+  // Subtle horizon glow behind the scene
   const hg=ctx.createRadialGradient(w*.72,h*.67,0,w*.72,h*.67,260);
   hg.addColorStop(0,"rgba(112,245,210,.12)");
   hg.addColorStop(1,"rgba(112,245,210,0)");
