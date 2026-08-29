@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -100,7 +101,7 @@ h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(232,255,2
 <div class="floor"></div><div class="gridglow"></div>
 <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="orb"></div>
 <div class="beam b1"></div><div class="beam b2"></div>
-<div class="screen screen-main"><div class="screen-top"><span>LOGICNEST // CORE</span><span>ONLINE</span></div><div class="screen-big">04</div><div class="screen-small">PROJECTS DEPLOYED</div><div class="scan"></div></div>
+<div class="screen screen-main"><div class="screen-top"><span>LOGICNEST // CORE</span><span>ONLINE</span></div><div class="screen-big">05</div><div class="screen-small">PROJECTS DEPLOYED</div><div class="scan"></div></div>
 <div class="card c1" onclick="openProjects()"><b>QUICK REDIRECTS</b><small>04 live projects</small><div class="line"></div></div>
 <div class="card c2" onclick="openTerminal()"><b>LOGICNEST CORE</b><small>interactive console</small><div class="line"></div></div>
 <div class="portal p1" onclick="openProject('builder')"><span>BUILD</span></div>
@@ -115,14 +116,15 @@ h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(232,255,2
 
 <div class="panel" id="projectsPanel" onclick="if(event.target===this)closePanel('projectsPanel')"><div class="panelbox"><div class="panelhead"><h2>Quick Redirects</h2><button class="close" onclick="closePanel('projectsPanel')">×</button></div><div class="grid" id="projectGrid"></div></div></div>
 <div class="panel" id="terminalPanel" onclick="if(event.target===this)closePanel('terminalPanel')"><div class="panelbox"><div class="panelhead"><h2>LogicNest Console</h2><button class="close" onclick="closePanel('terminalPanel')">×</button></div><div class="terminal-output" id="terminalOutput"><div><span class="ok">LOGICNEST CORE v4.0</span></div><div class="dim">3D portfolio shell loaded.</div><div>Type <span class="ok">/help</span> to see commands.</div></div><div class="command-line"><span>➜</span><input id="commandInput" autocomplete="off" placeholder="enter command..."></div></div></div>
-<div class="panel" id="aboutPanel" onclick="if(event.target===this)closePanel('aboutPanel')"><div class="panelbox aboutbox"><div class="panelhead"><h2>About LogicNest</h2><button class="close" onclick="closePanel('aboutPanel')">×</button></div><div class="about-grid"><div><span class="eyebrow">CREATOR PROFILE</span><h3>Builder. Scripter. Designer.</h3><p>A compact digital space for the work behind LogicNest. Explore projects, tools and experiments through an interactive 3D interface.</p></div><div class="stat"><strong>04</strong><span>LIVE PROJECTS</span></div><div class="stat"><strong>03D</strong><span>INTERFACE</span></div></div></div></div>
+<div class="panel" id="aboutPanel" onclick="if(event.target===this)closePanel('aboutPanel')"><div class="panelbox aboutbox"><div class="panelhead"><h2>About LogicNest</h2><button class="close" onclick="closePanel('aboutPanel')">×</button></div><div class="about-grid"><div><span class="eyebrow">CREATOR PROFILE</span><h3>Builder. Scripter. Designer.</h3><p>A compact digital space for the work behind LogicNest. Explore projects, tools and experiments through an interactive 3D interface.</p></div><div class="stat"><strong>05</strong><span>LIVE PROJECTS</span></div><div class="stat"><strong>03D</strong><span>INTERFACE</span></div></div></div></div>
 
 <script>
 const projects=[
 {id:"builder",name:"LogicNest Build",tag:"builder",url:"https://logicnestbuild.vercel.app/",desc:"Roblox builder — custom builds, architecture & immersive experiences."},
 {id:"scripter",name:"LogicNest Scripter",tag:"scripter",url:"https://logicnesttscripter.vercel.app/",desc:"Roblox scripter — utilities, game mechanics & automation tools."},
 {id:"clothing",name:"LogicNest Clothing",tag:"clothing",url:"https://logicnesttt.vercel.app/",desc:"Roblox clothing designer — premium shirts, pants & outfit collections."},
-{id:"ui",name:"LogicNest UI",tag:"ui",url:"https://logicnestui.vercel.app/",desc:"LogicNest UI — user interface designs, showcases & projects."}
+{id:"ui",name:"LogicNest UI",tag:"ui",url:"https://logicnestui.vercel.app/",desc:"LogicNest UI — user interface designs, showcases & projects."},
+{id:"model",name:"LogicNest Model",tag:"3d model",url:"https://logicnestmodel.vercel.app/",desc:"LogicNest Model — 3D modeling work, assets & showcases."}
 ];
 const grid=document.getElementById("projectGrid");
 grid.innerHTML=projects.map(p=>`<div class="project" onclick="window.open('${p.url}','_blank')"><h3>${p.name}</h3><p>${p.desc}</p><span class="tag">${p.tag} · live ↗</span></div>`).join("");
@@ -146,7 +148,7 @@ function runCommand(raw){
  if(c==="/help"||c==="help"){termWrite(`<span class="ok">Commands</span><br>/help · /projects · /open [project] · /status · /whoami · /clear · /theme [mint|mono]`)}
  else if(c==="/projects"||c==="projects"){projects.forEach((p,i)=>termWrite(`${i+1}. <span class="ok">${p.name}</span> <span class="dim">[${p.tag}]</span>`))}
  else if(c==="/open"||c==="open"){const q=args.join(" ").toLowerCase();const p=projects.find(x=>x.id===q||x.tag===q||x.name.toLowerCase().includes(q));if(p){termWrite(`<span class="ok">Opening ${escapeHtml(p.name)}...</span>`);openProject(p.id)}else termWrite("Project not found.","err")}
- else if(c==="/status"||c==="status"){termWrite(`<span class="ok">● ALL SYSTEMS OPERATIONAL</span><br>projects: 4<br>3D engine: online<br>scene: active<br>portfolio: deployed<br>render: <span class="ok">adaptive</span>`)}
+ else if(c==="/status"||c==="status"){termWrite(`<span class="ok">● ALL SYSTEMS OPERATIONAL</span><br>projects: 5<br>3D engine: online<br>scene: active<br>portfolio: deployed<br>render: <span class="ok">adaptive</span>`)}
  else if(c==="/about"||c==="about"){openAbout();termWrite(`<span class="ok">Opening creator profile...</span>`)}
  else if(c==="/whoami"||c==="whoami"){termWrite(`visitor@logicnest<br><span class="dim">role:</span> guest<br><span class="dim">environment:</span> 3D portfolio`)}
  else if(c==="/clear"||c==="clear"){output.innerHTML=""}
