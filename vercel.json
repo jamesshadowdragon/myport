@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/.well-known/discord",
-      "destination": "/.well-known/discord.txt"
+      "destination": "/api/discord"
     }
   ]
 }
