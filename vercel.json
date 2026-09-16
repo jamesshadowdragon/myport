@@ -1,13 +1,8 @@
 {
-  "headers": [
+  "rewrites": [
     {
       "source": "/.well-known/discord",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/plain"
-        }
-      ]
+      "destination": "/.well-known/discord.txt"
     }
   ]
 }
